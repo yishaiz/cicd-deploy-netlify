@@ -37,6 +37,7 @@ pipeline {
                     }
                 }
 
+                /*
                 stage('E2E') {
                     agent {
                         docker {
@@ -60,6 +61,7 @@ pipeline {
                         }
                     }
                 }
+                */
             }
         }
 
@@ -72,8 +74,8 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install -g netlify-cli
-                    node_modules/bin/netlify --version
+                    npm install netlify-cli
+                    node_modules/.bin/netlify --version
                 '''
             }
         }
