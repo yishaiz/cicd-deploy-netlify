@@ -81,7 +81,12 @@ pipeline {
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
                     echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
+                    
+                    # אימות עם הטוקן
                     node_modules/.bin/netlify status
+                    
+                    # הפעלת ה-deploy בפועל
+                    node_modules/.bin/netlify deploy --prod --dir=build
                 '''
             }
         }
