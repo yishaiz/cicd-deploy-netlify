@@ -79,8 +79,7 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
                     sh '''
-                        # npm install netlify-cli
-                        npm install nodemon
+                        npm install xxxxxxxxnodemon
                         node_modules/.bin/netlify --version
                         echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
                         
