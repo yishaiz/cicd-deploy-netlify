@@ -83,16 +83,16 @@ pipeline {
                         node_modules/.bin/netlify --version
                         echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
                         
-                        # DEBUG - בדיקת הטוקן
+                        # DEBUG - verify token
                         echo "Token exists: $([ -n "$NETLIFY_AUTH_TOKEN" ] && echo "YES" || echo "NO")"
                         echo "Token length: ${#NETLIFY_AUTH_TOKEN}"
                         echo "Token first 10 chars: ${NETLIFY_AUTH_TOKEN:0:10}..."
                         
-                        # ניסיון לאמת עם הטוקן
+                        # try with token
                         echo "Trying to authenticate..."
                         node_modules/.bin/netlify status --auth=$NETLIFY_AUTH_TOKEN
                         
-                        # אם זה עובד, נעשה deploy
+                        # deploy
                         node_modules/.bin/netlify deploy --prod --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
                     '''
                 }
