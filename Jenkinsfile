@@ -77,16 +77,22 @@ pipeline {
                 }
             }
             steps {
-                    withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
+                withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
                     sh '''
                         npm install netlify-cli
                         node_modules/.bin/netlify --version
                         echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
                         
-                        # בדיקת הטוקן
+                        # DEBUG - בדיקת הטוקן
                         echo "Token exists: $([ -n "$NETLIFY_AUTH_TOKEN" ] && echo "YES" || echo "NO")"
+                        echo "Token length: ${#NETLIFY_AUTH_TOKEN}"
+                        echo "Token first 10 chars: ${NETLIFY_AUTH_TOKEN:0:10}..."
                         
-                        # אימות עם הטוקן והפעלת deploy ישירות
+                        # ניסיון לאמת עם הטוקן
+                        echo "Trying to authenticate..."
+                        node_modules/.bin/netlify status --auth=$NETLIFY_AUTH_TOKEN
+                        
+                        # אם זה עובד, נעשה deploy
                         node_modules/.bin/netlify deploy --prod --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
                     '''
                 }
@@ -100,6 +106,3 @@ pipeline {
         }
     }
 }
-
-
- 
