@@ -40,7 +40,7 @@ pipeline {
                         '''
                     }
                 }
-
+                
                 /*
                 stage('E2E') {
                     agent {
@@ -68,6 +68,7 @@ pipeline {
                 */
             }
         }
+   
 
         stage('Deploy') {
             agent {
@@ -83,17 +84,13 @@ pipeline {
                         node_modules/.bin/netlify --version
                         echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
                         
-                        # DEBUG - verify token
-                        echo "Token exists: $([ -n "$NETLIFY_AUTH_TOKEN" ] && echo "YES" || echo "NO")"
-                        echo "Token length: ${#NETLIFY_AUTH_TOKEN}"
-                        echo "Token first 10 chars: ${NETLIFY_AUTH_TOKEN:0:10}..."
-                        
-                        # try with token
-                        echo "Trying to authenticate..."
-                        node_modules/.bin/netlify status --auth=$NETLIFY_AUTH_TOKEN
-                        
-                        # deploy
-                        node_modules/.bin/netlify deploy --prod --dir=build --site=$NETLIFY_SITE_ID --auth=$NETLIFY_AUTH_TOKEN
+                        # Deploy without triggering Netlify's build process
+                        node_modules/.bin/netlify deploy \
+                            --prod \
+                            --dir=build \
+                            --site=$NETLIFY_SITE_ID \
+                            --auth=$NETLIFY_AUTH_TOKEN \
+                            --skip-functions-cache
                     '''
                 }
             }
