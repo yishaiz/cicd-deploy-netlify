@@ -40,7 +40,7 @@ pipeline {
                         '''
                     }
                 }
-                
+                  
                 /*
                 stage('E2E') {
                     agent {
@@ -68,7 +68,6 @@ pipeline {
                 */
             }
         }
-   
 
         stage('Deploy') {
             agent {
@@ -90,7 +89,7 @@ pipeline {
                             --dir=build \
                             --site=$NETLIFY_SITE_ID \
                             --auth=$NETLIFY_AUTH_TOKEN \
-                            --skip-functions-cache
+                            --build=false
                     '''
                 }
             }
