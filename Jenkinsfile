@@ -83,13 +83,19 @@ pipeline {
                         node_modules/.bin/netlify --version
                         echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
                         
-                        # Deploy without triggering Netlify's build process
+
+                        echo "show netlify status"
+                        node_modules/.bin/netlify status
+                        
+                        echo " ***** run build ***** "
                         node_modules/.bin/netlify deploy \
-                            --prod \
                             --dir=build \
+                            --prod \
                             --site=$NETLIFY_SITE_ID \
-                            --auth=$NETLIFY_AUTH_TOKEN \
-                            --build=false
+                            --auth=$NETLIFY_AUTH_TOKEN"
+                        
+
+                        echo " ***** after build ***** "
                     '''
                 }
             }
@@ -102,3 +108,11 @@ pipeline {
         }
     }
 }
+
+                        // # Deploy without triggering Netlify's build process
+                        // node_modules/.bin/netlify deploy \
+                        //     --prod \
+                        //     --dir=build \
+                        //     --site=$NETLIFY_SITE_ID \
+                        //     --auth=$NETLIFY_AUTH_TOKEN \
+                        //     --build=false
