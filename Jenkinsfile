@@ -93,7 +93,7 @@ pipeline {
                             --prod \
                             --site=$NETLIFY_SITE_ID \
                             --auth=$NETLIFY_AUTH_TOKEN \
-                            --skip-functions-cache
+                            --offline
                         
 
                         echo " ***** after build ***** "
