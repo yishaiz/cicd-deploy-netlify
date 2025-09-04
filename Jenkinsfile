@@ -92,8 +92,7 @@ pipeline {
                             --dir=build \
                             --prod \
                             --site=$NETLIFY_SITE_ID \
-                            --auth=$NETLIFY_AUTH_TOKEN \
-                            --offline
+                            --auth=$NETLIFY_AUTH_TOKEN
                         
 
                         echo " ***** after build ***** "
