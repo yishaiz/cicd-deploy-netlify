@@ -41,7 +41,6 @@ pipeline {
                     }
                 }
                   
-                /*
                 stage('E2E') {
                     agent {
                         docker {
@@ -65,7 +64,6 @@ pipeline {
                         }
                     }
                 }
-                */
             }
         }
 
@@ -76,28 +74,50 @@ pipeline {
                     reuseNode true
                 }
             }
-            steps {
-                withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
-                    sh '''
-                        npm install netlify-cli
-                        node_modules/.bin/netlify --version
-                        echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
-                        
+    steps {
+        withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
+            sh '''
+                npm install netlify-cli node-jq
+                node_modules/.bin/netlify --version
+                echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
+                
 
-                        echo "show netlify status"
-                        node_modules/.bin/netlify status
-                        
-                        echo " ***** run build ***** "
-                        node_modules/.bin/netlify deploy \
-                            --dir=build \
-                            --prod \
-                            --site=$NETLIFY_SITE_ID \
-                            --auth=$NETLIFY_AUTH_TOKEN
-                        
+                echo "show netlify status"
+                node_modules/.bin/netlify status
+                
+                echo " ***** run build ***** "
+                node_modules/.bin/netlify deploy \
+                    --dir=build \
+                    --prod \
+                    --site=$NETLIFY_SITE_ID \
+                    --auth=$NETLIFY_AUTH_TOKEN > deploy-output.json
+                
+                node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                
+                echo " ***** after build ***** "
+            '''
+            script {
+                env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true).trim()
+            }
+        }
+    }
+        }
 
-                        echo " ***** after build ***** "
-                    '''
+        stage('E2E') {
+            agent {
+                docker {
+                    image 'mcr.microsoft.com/playwright:v1.54.0-noble'
+                    reuseNode true
                 }
+            }
+            environment {
+                STAGING_URL = "${env.STAGING_URL}"
+            }
+            steps {
+                sh '''
+                    echo "Running post-deployment tests..."
+                    npx playwright test --reporter=html
+                '''
             }
         }
     }
