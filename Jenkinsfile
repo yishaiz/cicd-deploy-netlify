@@ -60,7 +60,6 @@ pipeline {
                     post {
                         always {
                         echo 'E2E tests completed'
-                            // sh 'pkill -f serve || true'
                         }
                     }
                 }
@@ -74,33 +73,33 @@ pipeline {
                     reuseNode true
                 }
             }
-    steps {
-        withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
-            sh '''
-                npm install netlify-cli node-jq
-                node_modules/.bin/netlify --version
-                echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
-                
-
-                echo "show netlify status"
-                node_modules/.bin/netlify status
-                
-                echo " ***** run build ***** "
-                node_modules/.bin/netlify deploy \
-                    --dir=build \
-                    --prod \
-                    --site=$NETLIFY_SITE_ID \
-                    --auth=$NETLIFY_AUTH_TOKEN > deploy-output.json
-                
-                node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
-                
-                echo " ***** after build ***** "
-            '''
-            script {
-                env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true).trim()
+            steps {
+                withCredentials([string(credentialsId: 'netlify-token', variable: 'NETLIFY_AUTH_TOKEN')]) {
+                    sh '''
+                        npm install netlify-cli node-jq
+                        node_modules/.bin/netlify --version
+                        echo "Deploying to production/ Site (Project) ID: $NETLIFY_SITE_ID"
+                        
+                        echo "show netlify status"
+                        node_modules/.bin/netlify status
+                        
+                        echo " ***** run build ***** "
+                        node_modules/.bin/netlify deploy \
+                            --dir=build \
+                            --prod \
+                            --json \
+                            --site=$NETLIFY_SITE_ID \
+                            --auth=$NETLIFY_AUTH_TOKEN > deploy-output.json
+                        
+                        node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json
+                        
+                        echo " ***** after build ***** "
+                    '''
+                    script {
+                        env.STAGING_URL = sh(script: "node_modules/.bin/node-jq -r '.deploy_url' deploy-output.json", returnStdout: true).trim()
+                    }
+                }
             }
-        }
-    }
         }
 
         stage('E2E') {
@@ -128,11 +127,3 @@ pipeline {
         }
     }
 }
-
-                        // # Deploy without triggering Netlify's build process
-                        // node_modules/.bin/netlify deploy \
-                        //     --prod \
-                        //     --dir=build \
-                        //     --site=$NETLIFY_SITE_ID \
-                        //     --auth=$NETLIFY_AUTH_TOKEN \
-                        //     --build=false
