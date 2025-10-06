@@ -41,7 +41,7 @@ pipeline {
                     }
                 }
                   
-                stage('E2E') {
+                stage('Staging E2E') {
                     agent {
                         docker {
                             image 'mcr.microsoft.com/playwright:v1.54.0-jammy'
@@ -102,10 +102,10 @@ pipeline {
             }
         }
 
-        stage('E2E') {
+        stage('Prod E2E') {
             agent {
                 docker {
-                    image 'mcr.microsoft.com/playwright:v1.39.0-jammy'
+                    image 'mcr.microsoft.com/playwright:v1.54.0-jammy'
                     reuseNode true
                 }
             }
@@ -115,6 +115,8 @@ pipeline {
             steps {
                 sh '''
                     echo "Running post-deployment tests..."
+                    # Ensure playwright browsers are installed for this image/version
+                    npx playwright install
                     npx playwright test --reporter=html
                 '''
             }
