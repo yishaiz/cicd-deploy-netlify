@@ -111,7 +111,7 @@ pipeline {
                 }
             }
             environment {
-                # Export the staging URL into CI_ENVIRONMENT_URL so Playwright's baseURL picks it up
+                // Export the staging URL into CI_ENVIRONMENT_URL so Playwright's baseURL picks it up
                 CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
             }
             steps {
