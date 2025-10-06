@@ -51,7 +51,8 @@ pipeline {
                     steps {
                         sh '''
                             npm install serve
-                            node_modules/.bin/serve -s build &
+                            # Start static server on port 3000 because Playwright's baseURL uses http://localhost:3000
+                            node_modules/.bin/serve -s build -l 3000 &
                             sleep 5
                             npx playwright install
                             npx playwright test
@@ -110,14 +111,23 @@ pipeline {
                 }
             }
             environment {
-                STAGING_URL = "${env.STAGING_URL}"
+                # Export the staging URL into CI_ENVIRONMENT_URL so Playwright's baseURL picks it up
+                CI_ENVIRONMENT_URL = "${env.STAGING_URL}"
             }
             steps {
                 sh '''
                     echo "Running post-deployment tests..."
                     # Ensure playwright browsers are installed for this image/version
-                    npx playwright install
-                    npx playwright test --reporter=html
+                                        echo "CI_ENVIRONMENT_URL=$CI_ENVIRONMENT_URL"
+                                        # Try a quick HEAD request to validate the staging URL is reachable.
+                                        # Use curl if available, otherwise use a small node script.
+                                        if command -v curl >/dev/null 2>&1; then
+                                            curl -I "$CI_ENVIRONMENT_URL" || true
+                                        else
+                                            node -e "const https = require('https'); const u=process.env.CI_ENVIRONMENT_URL; if(!u){console.error('CI_ENVIRONMENT_URL not set'); process.exit(0);} https.get(u, r=>{console.log('status', r.statusCode); r.resume();}).on('error', e=>{console.error('connect error', e.message)});
+                                        fi
+                                        npx playwright install
+                                        npx playwright test --reporter=html
                 '''
             }
         }
