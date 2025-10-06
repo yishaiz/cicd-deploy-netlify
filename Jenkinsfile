@@ -67,7 +67,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Prod') {
             agent {
                 docker {
                     image 'node:18-alpine'
@@ -116,6 +116,8 @@ pipeline {
             }
             steps {
                 sh '''
+                    node --version
+                    
                     echo "Running post-deployment tests..."
                     # Ensure playwright browsers are installed for this image/version
                                         echo "CI_ENVIRONMENT_URL=$CI_ENVIRONMENT_URL"
@@ -124,7 +126,7 @@ pipeline {
                                         if command -v curl >/dev/null 2>&1; then
                                             curl -I "$CI_ENVIRONMENT_URL" || true
                                         else
-                                            node -e "const https = require('https'); const u=process.env.CI_ENVIRONMENT_URL; if(!u){console.error('CI_ENVIRONMENT_URL not set'); process.exit(0);} https.get(u, r=>{console.log('status', r.statusCode); r.resume();}).on('error', e=>{console.error('connect error', e.message)});
+                                            node -e "const https = require('https'); const u=process.env.CI_ENVIRONMENT_URL; if(!u){console.error('CI_ENVIRONMENT_URL not set'); process.exit(0);} https.get(u, r=>{console.log('status', r.statusCode); r.resume();}).on('error', e=>{console.error('connect error', e.message)});"
                                         fi
                                         npx playwright install
                                         npx playwright test --reporter=html
