@@ -1,7 +1,7 @@
 pipeline {
     environment {
         NETLIFY_SITE_ID = '5e83c00f-7843-498e-8cd3-42bad2b03b12'
-        REACT_APP_VERSION = '1.2.3'
+        REACT_APP_VERSION = '1.0.$BUILD_ID'
     }
 
     agent any
